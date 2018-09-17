@@ -7,6 +7,7 @@
 //
 
 #import "CNetService.h"
+#import "CNetService+Encryption.h"
 #import <AFNetworking/AFNetworking.h>
 @interface CNetService()
 
@@ -16,7 +17,7 @@
 @property (nonatomic, assign) CServiceAPIEnviroment enviroment;//项目环境
 @property (nonatomic, assign) CNetManagerRequestType requestType;//请求类型
 
-@property (nonatomic, strong) AFHTTPRequestSerializer * httpRequestSerializer;
+@property (nonatomic, strong) AFHTTPRequestSerializer <AFURLRequestSerialization>* httpRequestSerializer;
 @end
 @implementation CNetService
 + (CNetService *)sharedInstance{
@@ -29,11 +30,20 @@
     return service;
 }
 #pragma mark -- CNetServiceDelegate
-- (NSURLRequest *)requestWithUrl:(NSString *)url parans:(NSDictionary *)params requestType:(CNetManagerRequestType)requestType{
+- (NSURLRequest *)requestWithUrl:(NSString *)url params:(NSDictionary *)params requestType:(CNetManagerRequestType)requestType isEncryption:(BOOL)isEncryption{
     self.requestType = requestType;
     NSString * urlString = [NSString stringWithFormat:@"%@%@",self.rootUrl, url];
     
     NSMutableURLRequest * request = [self.httpRequestSerializer requestWithMethod:self.requestMethod URLString:urlString parameters:params error:nil];
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    
+    if (isEncryption == YES) {
+        NSDictionary * encryptionDic = [self encryptionWithMessage:params];
+        NSArray * keys = encryptionDic.allKeys;
+        [keys enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            [request setValue:encryptionDic[obj] forHTTPHeaderField:obj];
+        }];
+    }
     return [request copy];
 }
 
@@ -48,7 +58,7 @@
     switch (self.enviroment) {
         case CServiceAPIEnviromentDeveloper:
         {
-            _rootUrl = @"http://localhost:3000";
+            _rootUrl = @"http://192.168.1.200:81/hu";
         }
             break;
         case CTServiceAPIEnvironmentRelease:{

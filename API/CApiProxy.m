@@ -8,6 +8,17 @@
 
 #import "CApiProxy.h"
 #import <AFNetworking/AFNetworking.h>
+
+#ifdef DEBUG
+
+#define MLog(fmt, ...) NSLog((@"调用的方法:%s [Line %d] \n" fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__);
+#else
+
+#define MLog(...)
+
+#endif
+
+
 @interface CApiProxy()
 @property (nonatomic, strong) NSMutableDictionary  * requestTable;
 @property (nonatomic, strong) AFHTTPSessionManager * sessionManager;
@@ -26,6 +37,7 @@
 #pragma mark -- public method
 - (NSNumber *)p_callApiWithRequest:(NSURLRequest *)request success:(CApiCallBackSuccessBlock)success fail:(CApiCallBackFailBlock)fail{
 
+    
     __weak typeof(self) weakSelf = self;
     __block NSURLSessionTask * task = nil;
     task = [self.sessionManager dataTaskWithRequest:request
@@ -41,7 +53,7 @@
             fail? fail(error):nil;
         }else{
             NSDictionary * dataDic = [NSJSONSerialization JSONObjectWithData:responseObject options:NSJSONReadingMutableContainers error:nil];
-            
+            MLog(@"responseData == %@",dataDic);
             success? success(dataDic):nil;
         }
     }];
@@ -54,11 +66,13 @@
     
     return requestId;
 }
+//取消某个id的请求
 - (void)cancelRequestWithRequestId:(NSNumber *)requestId{
     NSURLSessionTask * requestOperation = self.requestTable[requestId];
     [requestOperation cancel];
     [self.requestTable removeObjectForKey:requestId];
 }
+//取消多个id的请求
 - (void)cancelRequestWithRequestList:(NSArray *)requestList{
     for (NSNumber * requestId in requestList) {
         [self cancelRequestWithRequestId:requestId];

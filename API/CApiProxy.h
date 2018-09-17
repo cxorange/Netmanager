@@ -13,8 +13,12 @@ typedef void(^CApiCallBackFailBlock) (NSError * error);
 
 + (CApiProxy *)sharedInstance;
 
-- (NSNumber *)p_callApiWithRequest:(NSURLRequest * _Nonnull)request success:(CApiCallBackSuccessBlock)success fail:(CApiCallBackFailBlock)fail;
+//发起请求
+- (NSNumber *)p_callApiWithRequest:(NSURLRequest * _Nonnull)request
+                           success:(CApiCallBackSuccessBlock)success
+                              fail:(CApiCallBackFailBlock)fail;
 
+//取消请求
 - (void)cancelRequestWithRequestId:(NSNumber  * _Nonnull)requestId;
 - (void)cancelRequestWithRequestList:(NSArray * _Nonnull)requestList;
 @end

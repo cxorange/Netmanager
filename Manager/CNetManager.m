@@ -28,11 +28,11 @@
     return self;
 }
 #pragma mark -- public method
-- (NSInteger)requestDataWithUrl:(NSString *)url params:(NSDictionary *)parames requestType:(CNetManagerRequestType)requestType identifer:(NSString *)identifer{
+- (NSInteger)requestDataWithUrl:(NSString *)url params:(NSDictionary *)parames requestType:(CNetManagerRequestType)requestType identifer:(NSString *)identifer isEncryption:(BOOL)isEncryption{
     self.identifer = [identifer copy];
     self.requestType = requestType;
     
-    NSInteger requestId = [self p_privateRequestWithUrl:url params:parames requestType:_requestType];
+    NSInteger requestId = [self p_privateRequestWithUrl:url params:parames requestType:_requestType isEncryption:isEncryption];
     
     return requestId;
 }
@@ -52,19 +52,22 @@
 }
 #pragma mark -- private method
 //发起请求
-- (NSInteger)p_privateRequestWithUrl:(NSString *)url params:(NSDictionary *)params requestType:(CNetManagerRequestType)requestType{
+- (NSInteger)p_privateRequestWithUrl:(NSString *)url params:(NSDictionary *)params requestType:(CNetManagerRequestType)requestType isEncryption:(BOOL)isEncryption{
     NSCAssert(url, @"url 不能为空");
+
     id <CNetServiceDelegate> service = [CNetService sharedInstance];
-    
     //创建
-    NSURLRequest * request = [service requestWithUrl:url parans:params requestType:requestType];
+    NSURLRequest * request = [service requestWithUrl:url params:params requestType:requestType isEncryption:isEncryption];
     __weak typeof(self) weakSelf = self;
     //发起
     __block NSNumber * requestId = nil;
     requestId = [[CApiProxy sharedInstance] p_callApiWithRequest:request success:^(NSDictionary * responseObject) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
+      
         [strongSelf.requestIdList removeObject:requestId];
+        
         strongSelf.responseObject = [responseObject copy];
+        
         if ([strongSelf.delegate respondsToSelector:@selector(managerCallAPIDidSuccess:)]) {
             [strongSelf.delegate managerCallAPIDidSuccess:strongSelf];
         }

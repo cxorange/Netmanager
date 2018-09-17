@@ -26,10 +26,11 @@ typedef NS_ENUM(NSUInteger, CNetManagerRequestType){
 };
 
 typedef NS_ENUM(NSUInteger, CNetManagerRequestErrorType){
-    CNetManagerRequestErrorBadRequest = 400,
-    CNetManagerRequestErrorUnauthorized = 401,
-    CNetManagerRequestErrorNotFount = 404,
-    CNetManagerRequestErrorCancelType = -999
+    CNetManagerRequestErrorBadRequest    = 400,
+    CNetManagerRequestErrorUnauthorized  = 401,
+    CNetManagerRequestErrorNotFount      = 404,
+    CNetManagerRequestErrotServerUnusual = 500,
+    CNetManagerRequestErrorCancel        = -999
 };
 //manager回调协议
 @protocol CNetManagerCallBackDelegate <NSObject>
@@ -38,7 +39,7 @@ typedef NS_ENUM(NSUInteger, CNetManagerRequestErrorType){
 @end
 //service协议
 @protocol CNetServiceDelegate <NSObject>
-- (NSURLRequest *)requestWithUrl:(NSString *)url parans:(NSDictionary *)params requestType:(CNetManagerRequestType)requestType;
+- (NSURLRequest *)requestWithUrl:(NSString *)url params:(NSDictionary *)params requestType:(CNetManagerRequestType)requestType isEncryption:(BOOL)isEncryption;
 @end
 
 #endif /* CNetDefine_h */

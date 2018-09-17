@@ -9,5 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "CNetDefine.h"
 @interface CNetService : NSObject<CNetServiceDelegate>
+@property (nonatomic, assign) BOOL isEncryption;
 + (CNetService *)sharedInstance;
 @end
